@@ -1,4 +1,4 @@
-//! `light-tray`: a tray icon for the office light.
+//! `light-tray`: a tray icon that controls a LAP CCT LED panel.
 //!
 //! - Menu (right-click, or left-click where the desktop allows): every button, plus pairing.
 //! - Scroll on the icon: brighter / dimmer.
@@ -168,7 +168,7 @@ impl ksni::Tray for LightTray {
     }
 
     fn title(&self) -> String {
-        "Office light".into()
+        "Light remote".into()
     }
 
     fn icon_name(&self) -> String {
@@ -202,7 +202,7 @@ impl ksni::Tray for LightTray {
             description = format!("{description}\nUpdate {v} available");
         }
         ToolTip {
-            title: "Office light".into(),
+            title: format!("Light remote v{}", update::VERSION),
             description,
             ..Default::default()
         }

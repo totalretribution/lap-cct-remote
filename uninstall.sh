@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Remove the office light remote. Keeps the pairing in ~/.config/light-remote; delete that too if you like.
+# Remove the LAP CCT light remote. Keeps the pairing in ~/.config/light-remote; delete that too if you like.
 set -euo pipefail
 
 if [ "${1:-}" = --system ]; then

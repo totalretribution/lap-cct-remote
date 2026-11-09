@@ -1,4 +1,4 @@
-//! Controls the office light as its remote.
+//! Controls the light as its remote.
 //!
 //! [`Controller`] is everything the tray needs: pair with a remote by hearing it, then send presses as that remote.
 //! Radio access goes through the small privileged `light-radio` helper; everything else runs as the user.
@@ -17,7 +17,7 @@ use crate::radio::Radio;
 pub const PAIR_TIMEOUT: Duration = Duration::from_secs(45);
 /// The button pairing listens for. Pressed twice, it turns the light off and back on, leaving it as it was.
 pub const PAIR_BUTTON: Button = Button::Power;
-/// How many POWER presses from one remote pairing needs, so a colleague's press can't pair the wrong one.
+/// How many POWER presses from one remote pairing needs, so someone else's press nearby can't pair the wrong one.
 pub const PAIR_PRESSES: usize = 2;
 /// The adapter used (the helper is fixed to the same one).
 const ADAPTER: &str = "hci0";

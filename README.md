@@ -1,6 +1,6 @@
-# Office light remote
+# LAP CCT remote
 
-A tray icon that controls the office LED panels (LAP TP22-R-CCT, driver EHC_050S105DN_TP02 "50W-2.4G-CCT") from a
+A tray icon that controls LAP CCT LED panels (LAP TP22-R-CCT, driver EHC_050S105DN_TP02 "50W-2.4G-CCT") from a
 Linux PC's built-in Bluetooth, by sending the same Bluetooth LE adverts their remotes send.
 
 ## Install
@@ -58,7 +58,7 @@ The icon shows on KDE, Cinnamon, and GNOME with the "AppIndicator and KStatusNot
 | Scroll on the icon | Brighter / dimmer |
 | Middle-click | Power |
 
-The tooltip and the top of the menu show which remote it's paired to. **Pair remote…** opens a window that shows
+The tooltip shows the version, and it and the top of the menu show which remote it's paired to. **Pair remote…** opens a window that shows
 pairing as it happens: a countdown, a dot for each POWER press heard, and the result, with Cancel / Try again.
 Closing the window cancels pairing. Errors from presses show as notifications.
 
