@@ -22,13 +22,12 @@ pub const VERSION: &str = match option_env!("LIGHT_REMOTE_VERSION") {
 
 /// Wait after starting before the first check, so the network is up after logging in.
 const FIRST_CHECK: Duration = Duration::from_secs(60);
-/// How often the tray looks again; GitHub is asked at most once per [`GITHUB_INTERVAL`], and the
-/// answer is cached in between (also across restarts).
-const RECHECK: Duration = Duration::from_secs(6 * 60 * 60);
-const GITHUB_INTERVAL: Duration = Duration::from_secs(24 * 60 * 60);
+/// After that, while the tray keeps running.
+const RECHECK: Duration = Duration::from_secs(24 * 60 * 60);
 
-/// Checks in the background for as long as the tray runs, calling `found` with the newer
-/// version's tag (`v0.2.0`) whenever there is one. Offline, rate limited or a bad response: says nothing.
+/// Checks in the background each time the tray starts and then once a day for as long as it runs,
+/// calling `found` with the newer version's tag (`v0.2.0`) whenever there is one. Every check asks
+/// GitHub; nothing is cached. Offline, rate limited or a bad response: says nothing.
 pub fn spawn(found: impl Fn(String) + Send + 'static) {
     if std::env::var_os(OPT_OUT).is_some() {
         return;
@@ -37,7 +36,7 @@ pub fn spawn(found: impl Fn(String) + Send + 'static) {
         thread::sleep(FIRST_CHECK);
         loop {
             let informer = update_informer::new(registry::GitHub, REPO, VERSION)
-                .interval(GITHUB_INTERVAL)
+                .interval(Duration::ZERO)
                 .timeout(Duration::from_secs(10));
             if let Ok(Some(version)) = informer.check_version() {
                 found(version.to_string());

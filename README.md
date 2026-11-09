@@ -22,8 +22,9 @@ To remove it, run `./uninstall.sh`.
 The binaries are built against glibc 2.31, so the packages install on Debian 11, Ubuntu 20.04, Mint 20 and newer,
 and on Fedora. It needs zig and `cargo install --locked cargo-deb cargo-generate-rpm cargo-zigbuild`.
 
-The packages install to `/usr` (`/usr/bin/light-tray`, `/usr/libexec/light-radio`, the icon and a menu entry), and
-start the tray at login for every user (`/etc/xdg/autostart`). Only members of the `light-remote` group can use the
+The packages install to `/usr` (`/usr/bin/light-tray`, `/usr/libexec/light-radio`, the icon and a **Light remote**
+entry in the applications menu, under Utilities), and start the tray at login for every user (`/etc/xdg/autostart`);
+each user can turn that off with **Start at login** in the tray menu. Only members of the `light-remote` group can use the
 light: installing creates the group and adds whoever installed it through `sudo` or `pkexec`. Add anyone else with
 `sudo usermod -aG light-remote <user>`; they need to log out and back in.
 
@@ -53,7 +54,7 @@ The icon shows on KDE, Cinnamon, and GNOME with the "AppIndicator and KStatusNot
 
 | Do | Gets |
 | --- | --- |
-| Right-click (or left-click) | Menu: Power, Night, Brighter, Dimmer, Cooler, Warmer; pair / unpair; quit |
+| Right-click (or left-click) | Menu: Power, Night, Brighter, Dimmer, Cooler, Warmer; pair / unpair; start at login; quit |
 | Scroll on the icon | Brighter / dimmer |
 | Middle-click | Power |
 
@@ -61,8 +62,12 @@ The tooltip and the top of the menu show which remote it's paired to. **Pair rem
 pairing as it happens: a countdown, a dot for each POWER press heard, and the result, with Cancel / Try again.
 Closing the window cancels pairing. Errors from presses show as notifications.
 
+**Start at login** is ticked when the tray starts with your desktop session. Unticking it writes
+`~/.config/autostart/light-tray.desktop` with `Hidden=true`, which overrides the packages' system-wide entry for you
+alone; ticking it again removes that file. After quitting, start the tray again from the applications menu.
+
 **Updates.** The tray checks this repository's GitHub releases for a newer version: a minute after it starts, then
-every few hours, asking GitHub at most once a day. When there is one it shows a notification once, adds **Get
+once a day while it keeps running. When there is one it shows a notification once, adds **Get
 update…** to the menu (which opens the release page) and mentions it in the tooltip. It never updates itself; install
 the new package as usual. To turn the check off, set `LIGHT_REMOTE_NO_UPDATE_CHECK=1` in the tray's environment.
 

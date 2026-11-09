@@ -6,5 +6,6 @@ Exec=light-tray
 Icon=light-remote
 Terminal=false
 Categories=Utility;
+Keywords=light;lamp;LED;panel;remote;CCT;
 StartupNotify=false
 X-GNOME-Autostart-enabled=true
