@@ -1,4 +1,4 @@
-//! The Bluetooth LE adverts sent by the office light's remotes (eWeLink-style, "50W-2.4G-CCT" driver).
+//! The Bluetooth LE adverts sent by LAP CCT LED panel remotes (eWeLink-style, "50W-2.4G-CCT" driver).
 //!
 //! A press is about 0.5 s of identical legacy `ADV_NONCONN_IND` adverts on channel 37 from the random
 //! address `11:22:33:44:55:66`. The 31 bytes of advert data are:

@@ -1,6 +1,6 @@
 [package]
 name = "light-protocol"
-description = "Adverts sent by the office light's 2.4 GHz remotes: building, checking, CRC"
+description = "Adverts sent by LAP CCT LED panel remotes: building, checking, CRC"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

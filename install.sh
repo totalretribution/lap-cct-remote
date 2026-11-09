@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build and install the office light remote for the current user. Run from a normal terminal: ./install.sh
+# Build and install the LAP CCT light remote for the current user. Run from a normal terminal: ./install.sh
 #
 # Installs:
 #   /usr/local/bin/light-tray        tray icon
@@ -67,6 +67,6 @@ sleep 0.5
 setsid -f "$BIN/light-tray" >/dev/null 2>&1
 
 echo
-echo "Installed. Right-click the tray icon and choose 'Pair remote…', then press WARMER twice on your remote."
+echo "Installed. Right-click the tray icon and choose 'Pair remote…', then press POWER twice on your remote."
 echo "On the icon: scroll for brighter/dimmer, middle-click for power."
 echo "To remove: $HERE/uninstall.sh"

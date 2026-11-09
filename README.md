@@ -1,6 +1,6 @@
-# Office light remote
+# LAP CCT remote
 
-A tray icon that controls the office LED panels (LAP TP22-R-CCT, driver EHC_050S105DN_TP02 "50W-2.4G-CCT") from a
+A tray icon that controls LAP CCT LED panels (LAP TP22-R-CCT, driver EHC_050S105DN_TP02 "50W-2.4G-CCT") from a
 Linux PC's built-in Bluetooth, by sending the same Bluetooth LE adverts their remotes send.
 
 ## Install
