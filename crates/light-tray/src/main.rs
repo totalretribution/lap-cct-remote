@@ -9,6 +9,7 @@
 //! AppIndicator extension. Threads: the tray service runs on its own, presses and pairing run one
 //! at a time on a worker, and the main thread shows the pairing window when asked.
 
+mod autostart;
 mod bluez;
 mod config;
 mod controller;
@@ -28,7 +29,7 @@ use std::thread;
 
 use controller::{Controller, Error, PairProgress};
 use ksni::blocking::{Handle, TrayMethods};
-use ksni::menu::{Disposition, StandardItem};
+use ksni::menu::{CheckmarkItem, Disposition, StandardItem};
 use ksni::{MenuItem, Orientation, ToolTip};
 use light_protocol::{Button, RemoteId};
 use pairing::{Phase, Session};
@@ -61,6 +62,8 @@ struct LightTray {
     error: Option<String>,
     /// A newer release's tag (`v0.2.0`), once the update check finds one.
     new_version: Option<String>,
+    /// Whether the tray starts at login; read again each time the menu opens.
+    autostart: bool,
 }
 
 impl LightTray {
@@ -224,6 +227,7 @@ impl ksni::Tray for LightTray {
         if !self.is_pairing() {
             self.reload();
         }
+        self.autostart = autostart::enabled();
     }
 
     fn menu(&self) -> Vec<MenuItem<Self>> {
@@ -268,6 +272,21 @@ impl ksni::Tray for LightTray {
             }
         }
         menu.push(MenuItem::Separator);
+        menu.push(
+            CheckmarkItem {
+                label: "Start at login".into(),
+                checked: self.autostart,
+                activate: Box::new(|t: &mut Self| {
+                    let on = !t.autostart;
+                    match autostart::set(on) {
+                        Ok(()) => t.autostart = on,
+                        Err(e) => t.error = Some(format!("Couldn't change starting at login: {e}")),
+                    }
+                }),
+                ..Default::default()
+            }
+            .into(),
+        );
         if let Some(v) = &self.new_version {
             menu.push(item(
                 &format!("Get update {v}…"),
@@ -361,6 +380,11 @@ fn single_instance() -> Option<File> {
 fn main() -> ExitCode {
     let Some(_instance) = single_instance() else {
         eprintln!("light-tray: already running");
+        // Started from the menu: say where it is rather than doing nothing
+        notify(
+            "Light remote is already running",
+            "Use its icon in the system tray.",
+        );
         return ExitCode::SUCCESS;
     };
     let controller = match Controller::from_env() {
@@ -385,6 +409,7 @@ fn main() -> ExitCode {
         pairing: None,
         error: None,
         new_version: None,
+        autostart: autostart::enabled(),
     };
     tray.reload();
 
