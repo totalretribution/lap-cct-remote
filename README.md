@@ -24,9 +24,8 @@ and on Fedora. It needs zig and `cargo install --locked cargo-deb cargo-generate
 
 The packages install to `/usr` (`/usr/bin/light-tray`, `/usr/libexec/light-radio`, the icon and a **Light remote**
 entry in the applications menu, under Utilities), and start the tray at login for every user (`/etc/xdg/autostart`);
-each user can turn that off with **Start at login** in the tray menu. Only members of the `light-remote` group can use the
-light: installing creates the group and adds whoever installed it through `sudo` or `pkexec`. Add anyone else with
-`sudo usermod -aG light-remote <user>`; they need to log out and back in.
+each user can turn that off with **Start at login** in the tray menu. Every user on the PC can use the light straight
+after installing, with no group to join and no need to log out.
 
 The `.deb` maintainer is a placeholder (`root@localhost`); set a real one in `crates/light-tray/Cargo.toml` before
 distributing the packages further.
@@ -79,8 +78,10 @@ the new package as usual. To turn the check off, set `LIGHT_REMOTE_NO_UPDATE_CHE
 | `crates/light-radio` | The helper the tray runs for radio access, and the only privileged part: a raw HCI socket. `send` transmits one advert and refuses anything that isn't a remote advert with a valid CRC; `listen` prints remote presses heard |
 | `crates/protocol` | `light-protocol`: `Advert` (parse, check, build presses), `Button`, `Address`, CRC-16. `no_std`, no dependencies; shared by both |
 
-**Privileges.** `light-radio` is installed to `/usr/local/libexec` as `root:<your primary group>` by `install.sh`, or to
-`/usr/libexec` as `root:light-remote` by the packages; either way mode `0750`, with the `cap_net_raw` file capability. The tray itself never runs privileged. Pairing asks BlueZ (over
+**Privileges.** `light-radio` is installed to `/usr/local/libexec` by `install.sh`, or to `/usr/libexec` by the
+packages; either way `root:root`, mode `0755`, with the `cap_net_raw` file capability, so any user can run it. That's
+deliberate: the light takes commands from anyone's remote over open radio, so limiting who can run the helper protects
+nothing, and the helper only sends checked remote adverts and reports remote presses it hears. The tray itself never runs privileged. Pairing asks BlueZ (over
 D-Bus, as you) for LE scanning with duplicates reported; `light-radio listen` only reads the reports.
 
 **Threads.** The tray service runs on its own thread; presses and pairing run one at a time on a worker; the main
