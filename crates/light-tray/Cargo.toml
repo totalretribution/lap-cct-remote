@@ -22,7 +22,7 @@ zbus = "5"
 [lints]
 workspace = true
 
-# Packages, built by package.sh. Both install light-tray, the light-radio helper (runnable by the light-remote group,
+# Packages, built by package.sh. Both install light-tray, the light-radio helper (runnable by any user,
 # with cap_net_raw), the icon, a menu entry, and a login autostart entry for every user.
 
 [package.metadata.deb]
@@ -33,7 +33,7 @@ section = "utils"
 priority = "optional"
 extended-description = """\
 A tray icon that controls LAP CCT LED panels (50W-2.4G-CCT driver) from the PC's built-in \
-Bluetooth, by sending the same adverts as their remotes. Members of the light-remote group can use it."""
+Bluetooth, by sending the same adverts as their remotes. Any user on the PC can use it."""
 depends = "libc6 (>= 2.31), bluez, libcap2-bin, passwd, libegl1, libxkbcommon0, libwayland-client0, libwayland-egl1"
 recommends = "libx11-6, libxcursor1, libxi6, libxrandr2"
 maintainer-scripts = "packaging/deb/"
@@ -54,11 +54,10 @@ assets = [
 [package.metadata.generate-rpm]
 name = "light-remote"
 summary = "Tray icon that controls LAP CCT LED panels over Bluetooth"
-pre_install_script = "packaging/rpm/pre-install.sh"
 post_install_script = "packaging/rpm/post-install.sh"
 assets = [
     { source = "target/release/light-tray", dest = "/usr/bin/light-tray", mode = "755" },
-    { source = "target/release/light-radio", dest = "/usr/libexec/light-radio", mode = "750", group = "light-remote", caps = "cap_net_raw=ep" },
+    { source = "target/release/light-radio", dest = "/usr/libexec/light-radio", mode = "755", caps = "cap_net_raw=ep" },
     { source = "assets/light-tray.desktop", dest = "/usr/share/applications/light-tray.desktop", mode = "644" },
     { source = "assets/light-tray.desktop", dest = "/etc/xdg/autostart/light-tray.desktop", mode = "644", config = "noreplace" },
     { source = "assets/light-remote.svg", dest = "/usr/share/icons/hicolor/scalable/apps/light-remote.svg", mode = "644" },

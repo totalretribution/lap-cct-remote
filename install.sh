@@ -3,7 +3,7 @@
 #
 # Installs:
 #   /usr/local/bin/light-tray        tray icon
-#   /usr/local/libexec/light-radio   radio helper, with cap_net_raw, runnable only by your group
+#   /usr/local/libexec/light-radio   radio helper, with cap_net_raw, runnable by any user
 #   the light-remote icon, a menu entry, and a login autostart entry for the tray.
 # Root steps go through pkexec (one password prompt).
 set -euo pipefail
@@ -13,14 +13,13 @@ LIBEXEC=/usr/local/libexec
 APPS=/usr/local/share/applications
 ICONS=/usr/local/share/icons/hicolor
 
-# --- root part, run by pkexec below: install.sh --system <group> <release dir> <repo dir>
+# --- root part, run by pkexec below: install.sh --system <release dir> <repo dir>
 if [ "${1:-}" = --system ]; then
-    group="$2" release="$3" repo="$4"
+    release="$2" repo="$3"
     [ "$(id -u)" = 0 ] || { echo "--system must run as root" >&2; exit 1; }
-    getent group "$group" >/dev/null || { echo "no group $group" >&2; exit 1; }
 
     install -o root -g root -m 0755 "$release/light-tray" "$BIN/light-tray"
-    install -o root -g "$group" -m 0750 -D "$release/light-radio" "$LIBEXEC/light-radio"
+    install -o root -g root -m 0755 -D "$release/light-radio" "$LIBEXEC/light-radio"
     setcap cap_net_raw+ep "$LIBEXEC/light-radio"
     install -o root -g root -m 0644 -D "$repo/crates/light-tray/assets/light-tray.desktop" "$APPS/light-tray.desktop"
     assets="$repo/crates/light-tray/assets"
@@ -33,7 +32,6 @@ if [ "${1:-}" = --system ]; then
 fi
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
-GROUP="$(id -gn)"
 
 # --- check what's needed
 missing=()
@@ -46,16 +44,12 @@ systemctl is-active --quiet bluetooth 2>/dev/null || missing+=("the bluetooth se
 if [ ${#missing[@]} -gt 0 ]; then
     echo "Missing:"; printf '  - %s\n' "${missing[@]}"; exit 1
 fi
-others="$(getent group "$GROUP" | cut -d: -f4)"
-if [ -n "$others" ] && [ "$others" != "$(id -un)" ]; then
-    echo "Note: light-radio will be runnable by everyone in your group '$GROUP' ($others)."
-fi
 
 # --- build
 (cd "$HERE" && cargo build --release --locked)
 
 # --- install (root)
-pkexec "$HERE/install.sh" --system "$GROUP" "$HERE/target/release" "$HERE"
+pkexec "$HERE/install.sh" --system "$HERE/target/release" "$HERE"
 
 # --- tray autostart
 mkdir -p ~/.config/autostart

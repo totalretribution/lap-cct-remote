@@ -11,8 +11,6 @@ use crate::controller::Error;
 
 /// Where the helper is installed: by `install.sh` (checked first, so a source install wins), or by the packages.
 pub const INSTALL_PATHS: [&str; 2] = ["/usr/local/libexec/light-radio", "/usr/libexec/light-radio"];
-/// The group packages let run the helper.
-pub const GROUP: &str = "light-remote";
 
 #[derive(Clone, Debug)]
 pub struct Radio {
@@ -46,8 +44,7 @@ impl Radio {
             Error::RadioMissing(self.path.clone())
         } else if e.kind() == ErrorKind::PermissionDenied {
             Error::Radio(format!(
-                "not allowed to run {}: add yourself to the {GROUP} group \
-                 (sudo usermod -aG {GROUP} $USER), then log out and back in",
+                "not allowed to run {}: reinstall the light-remote package (or rerun install.sh)",
                 self.path.display()
             ))
         } else {
