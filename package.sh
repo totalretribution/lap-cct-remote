@@ -34,13 +34,15 @@ if [ ${#missing[@]} -gt 0 ]; then
 fi
 
 cd "$HERE"
-cargo zigbuild --release --locked --target "$TARGET.$GLIBC" -p light-tray -p light-radio
-
 deb_args=() rpm_args=()
 if [ -n "$VERSION" ]; then
+    # The tray reports this version, e.g. when checking for updates
+    export LIGHT_REMOTE_VERSION="$VERSION"
     deb_args=(--deb-version "$VERSION-1")
     rpm_args=(--set-metadata "version = \"$VERSION\"")
 fi
+
+cargo zigbuild --release --locked --target "$TARGET.$GLIBC" -p light-tray -p light-radio
 
 rm -rf "$OUT"
 mkdir -p "$OUT"

@@ -16,6 +16,7 @@ mod dialog;
 mod icon;
 mod pairing;
 mod radio;
+mod update;
 
 use std::fs::File;
 use std::path::PathBuf;
@@ -58,6 +59,8 @@ struct LightTray {
     /// The pairing attempt in progress, if any.
     pairing: Option<Session>,
     error: Option<String>,
+    /// A newer release's tag (`v0.2.0`), once the update check finds one.
+    new_version: Option<String>,
 }
 
 impl LightTray {
@@ -192,6 +195,9 @@ impl ksni::Tray for LightTray {
         } else if self.paired.is_some() && !self.is_pairing() {
             description.push_str("\nScroll to dim, middle-click for power");
         }
+        if let Some(v) = &self.new_version {
+            description = format!("{description}\nUpdate {v} available");
+        }
         ToolTip {
             title: "Office light".into(),
             description,
@@ -262,6 +268,14 @@ impl ksni::Tray for LightTray {
             }
         }
         menu.push(MenuItem::Separator);
+        if let Some(v) = &self.new_version {
+            menu.push(item(
+                &format!("Get update {v}…"),
+                "software-update-available-symbolic",
+                true,
+                |_| update::open_releases(),
+            ));
+        }
         menu.push(item("Quit", "application-exit-symbolic", true, |t| {
             t.cancel_pairing();
             t.quitting.store(true, Ordering::SeqCst);
@@ -370,6 +384,7 @@ fn main() -> ExitCode {
         paired: None,
         pairing: None,
         error: None,
+        new_version: None,
     };
     tray.reload();
 
@@ -387,6 +402,23 @@ fn main() -> ExitCode {
 
     let worker_handle = handle.clone();
     thread::spawn(move || worker(&controller, &jobs_rx, &queued, &worker_handle));
+
+    // Tell the user about a newer release once, when it's first found
+    let update_handle = handle.clone();
+    update::spawn(move |version| {
+        let first = update_handle
+            .update(|t| t.new_version.replace(version.clone()).as_ref() != Some(&version))
+            .unwrap_or(false);
+        if first {
+            notify(
+                &format!("Light remote {version} is available"),
+                &format!(
+                    "You have v{}. Choose \"Get update\" in the tray menu to download it.",
+                    update::VERSION
+                ),
+            );
+        }
+    });
 
     // The main thread owns the windowing event loop, so the pairing window opens here
     while let Ok(Ui::ShowPairing(session)) = ui_rx.recv() {
