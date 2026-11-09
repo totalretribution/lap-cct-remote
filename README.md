@@ -30,6 +30,15 @@ light: installing creates the group and adds whoever installed it through `sudo`
 The `.deb` maintainer is a placeholder (`root@localhost`); set a real one in `crates/light-tray/Cargo.toml` before
 distributing the packages further.
 
+### Releases
+
+GitHub Actions (`.github/workflows/packages.yml`) checks the code and builds both packages on every push to `main` and
+every pull request; they're attached to the run as an artifact.
+
+To release, create a release on GitHub with a tag like `v0.2.0` and publish it. The workflow builds the packages at
+that version (`0.2.0`) and attaches them to the release; there's no need to change `Cargo.toml`. Versions are numbers
+and dots (letters allowed, but no `-`), as Debian and RPM require. Locally, `./package.sh 0.2.0` does the same.
+
 ## Use
 
 The icon shows on KDE, Cinnamon, and GNOME with the "AppIndicator and KStatusNotifierItem Support" extension.
