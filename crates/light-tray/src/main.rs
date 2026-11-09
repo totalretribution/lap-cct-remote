@@ -202,7 +202,7 @@ impl ksni::Tray for LightTray {
             description = format!("{description}\nUpdate {v} available");
         }
         ToolTip {
-            title: "Light remote".into(),
+            title: format!("Light remote v{}", update::VERSION),
             description,
             ..Default::default()
         }
