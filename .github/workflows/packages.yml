@@ -1,13 +1,16 @@
 # Checks the code and builds the .deb and .rpm on every push and pull request.
-# Publishing a GitHub release (tag v0.2.0, ...) builds them at the tag's version and attaches them to it.
+#
+# Pushing a version tag releases it:
+#   git tag v0.2.0 && git push origin v0.2.0
+# builds the packages at the tag's version (0.2.0; Cargo.toml's doesn't matter) and publishes a GitHub
+# release for the tag with them attached. To redo a release, run this workflow by hand on its tag.
 name: Packages
 
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   pull_request:
-  release:
-    types: [published]
   workflow_dispatch:
 
 permissions:
@@ -42,10 +45,10 @@ jobs:
         with:
           tool: cargo-deb,cargo-generate-rpm,cargo-zigbuild
 
-      # A release's packages get its tag's version (v0.2.0 -> 0.2.0); other builds use Cargo.toml's
+      # A tag's packages get its version (v0.2.0 -> 0.2.0); other builds use Cargo.toml's
       - name: Build the packages
         env:
-          TAG: ${{ github.event.release.tag_name }}
+          TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
         run: ./package.sh "${TAG#v}"
 
       - uses: actions/upload-artifact@v4
@@ -55,7 +58,7 @@ jobs:
           if-no-files-found: error
 
   release:
-    if: github.event_name == 'release'
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
     needs: packages
     runs-on: ubuntu-latest
     permissions:
@@ -65,8 +68,16 @@ jobs:
         with:
           name: packages
           path: packages
-      - name: Attach the packages to the release
+      - run: cd packages && sha256sum * > SHA256SUMS
+      - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.event.release.tag_name }}
-        run: gh release upload "$TAG" packages/* --repo "$GITHUB_REPOSITORY" --clobber
+          TAG: ${{ github.ref_name }}
+        run: |
+          # Reuse the release if there is one (made on GitHub first, or a rerun); otherwise create it
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" packages/* --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$TAG" packages/* --repo "$GITHUB_REPOSITORY" \
+              --verify-tag --title "$TAG" --generate-notes
+          fi

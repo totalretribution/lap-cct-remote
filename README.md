@@ -35,9 +35,17 @@ distributing the packages further.
 GitHub Actions (`.github/workflows/packages.yml`) checks the code and builds both packages on every push to `main` and
 every pull request; they're attached to the run as an artifact.
 
-To release, create a release on GitHub with a tag like `v0.2.0` and publish it. The workflow builds the packages at
-that version (`0.2.0`) and attaches them to the release; there's no need to change `Cargo.toml`. Versions are numbers
-and dots (letters allowed, but no `-`), as Debian and RPM require. Locally, `./package.sh 0.2.0` does the same.
+To release, push a version tag:
+
+```
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+The workflow builds the packages at that version (`0.2.0`), creates the GitHub release for the tag and attaches them
+with a `SHA256SUMS` file; there's no need to change `Cargo.toml`. Versions are numbers and dots (letters allowed, but
+no `-`), as Debian and RPM require. To redo a release, run the workflow by hand on its tag (Actions, Packages, Run
+workflow, then pick the tag). Locally, `./package.sh 0.2.0` builds the same packages.
 
 ## Use
 
@@ -53,11 +61,16 @@ The tooltip and the top of the menu show which remote it's paired to. **Pair rem
 pairing as it happens: a countdown, a dot for each POWER press heard, and the result, with Cancel / Try again.
 Closing the window cancels pairing. Errors from presses show as notifications.
 
+**Updates.** The tray checks this repository's GitHub releases for a newer version: a minute after it starts, then
+every few hours, asking GitHub at most once a day. When there is one it shows a notification once, adds **Get
+update…** to the menu (which opens the release page) and mentions it in the tooltip. It never updates itself; install
+the new package as usual. To turn the check off, set `LIGHT_REMOTE_NO_UPDATE_CHECK=1` in the tray's environment.
+
 ## Layout
 
 | Crate | What |
 | --- | --- |
-| `crates/light-tray` | The program. `main.rs` is the tray (`ksni`, StatusNotifierItem over D-Bus) and the threads. `dialog.rs` is the pairing window (`egui`/`eframe`); `pairing.rs` is the pairing state the tray, worker and window share. `controller.rs` pairs and presses; `config.rs` is the pairing file; `radio.rs` runs the helper; `bluez.rs` turns on LE scanning for pairing. `icon.rs` and `assets/` are the icon and menu entry; `packaging/` has the package install scripts |
+| `crates/light-tray` | The program. `main.rs` is the tray (`ksni`, StatusNotifierItem over D-Bus) and the threads. `dialog.rs` is the pairing window (`egui`/`eframe`); `pairing.rs` is the pairing state the tray, worker and window share. `controller.rs` pairs and presses; `config.rs` is the pairing file; `radio.rs` runs the helper; `bluez.rs` turns on LE scanning for pairing. `update.rs` checks for new releases. `icon.rs` and `assets/` are the icon and menu entry; `packaging/` has the package install scripts |
 | `crates/light-radio` | The helper the tray runs for radio access, and the only privileged part: a raw HCI socket. `send` transmits one advert and refuses anything that isn't a remote advert with a valid CRC; `listen` prints remote presses heard |
 | `crates/protocol` | `light-protocol`: `Advert` (parse, check, build presses), `Button`, `Address`, CRC-16. `no_std`, no dependencies; shared by both |
 
