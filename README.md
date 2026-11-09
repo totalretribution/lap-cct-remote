@@ -58,7 +58,7 @@ The icon shows on KDE, Cinnamon, and GNOME with the "AppIndicator and KStatusNot
 | Scroll on the icon | Brighter / dimmer |
 | Middle-click | Power |
 
-The tooltip shows the version and which remote it's paired to, as does the top of the menu. **Pair remote…** opens a window that shows
+The tooltip shows the version, and it and the top of the menu show which remote it's paired to. **Pair remote…** opens a window that shows
 pairing as it happens: a countdown, a dot for each POWER press heard, and the result, with Cancel / Try again.
 Closing the window cancels pairing. Errors from presses show as notifications.
 
