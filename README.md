@@ -67,7 +67,7 @@ Closing the window cancels pairing. Errors from presses show as notifications.
 alone; ticking it again removes that file. After quitting, start the tray again from the applications menu.
 
 **Updates.** The tray checks this repository's GitHub releases for a newer version: a minute after it starts, then
-every few hours, asking GitHub at most once a day. When there is one it shows a notification once, adds **Get
+once a day while it keeps running. When there is one it shows a notification once, adds **Get
 update…** to the menu (which opens the release page) and mentions it in the tooltip. It never updates itself; install
 the new package as usual. To turn the check off, set `LIGHT_REMOTE_NO_UPDATE_CHECK=1` in the tray's environment.
 
