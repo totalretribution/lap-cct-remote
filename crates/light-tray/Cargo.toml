@@ -1,0 +1,78 @@
+[package]
+name = "light-tray"
+description = "Tray icon that controls the office light over Bluetooth"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+light-protocol.workspace = true
+libc.workspace = true
+fastrand = "2"
+ksni = { version = "0.3", default-features = false, features = ["blocking", "async-io"] }
+notify-rust = { version = "4", default-features = false, features = ["z"] }
+eframe = { version = "0.37", default-features = false, features = ["accesskit", "default_fonts", "glow", "wayland", "x11"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+zbus = "5"
+
+[lints]
+workspace = true
+
+# Packages, built by package.sh. Both install light-tray, the light-radio helper (runnable by the light-remote group,
+# with cap_net_raw), the icon, a menu entry, and a login autostart entry for every user.
+
+[package.metadata.deb]
+name = "light-remote"
+# A placeholder: Debian packages need a maintainer
+maintainer = "Light remote packagers <root@localhost>"
+section = "utils"
+priority = "optional"
+extended-description = """\
+A tray icon that controls the office LED panels (50W-2.4G-CCT driver) from the PC's built-in \
+Bluetooth, by sending the same adverts as their remotes. Members of the light-remote group can use it."""
+depends = "libc6 (>= 2.31), bluez, libcap2-bin, passwd, libegl1, libxkbcommon0, libwayland-client0, libwayland-egl1"
+recommends = "libx11-6, libxcursor1, libxi6, libxrandr2"
+maintainer-scripts = "packaging/deb/"
+assets = [
+    ["target/release/light-tray", "usr/bin/", "755"],
+    ["target/release/light-radio", "usr/libexec/", "755"],
+    ["assets/light-tray.desktop", "usr/share/applications/", "644"],
+    ["assets/light-tray.desktop", "etc/xdg/autostart/", "644"],
+    ["assets/light-remote.svg", "usr/share/icons/hicolor/scalable/apps/", "644"],
+    ["assets/light-remote-16.png", "usr/share/icons/hicolor/16x16/apps/light-remote.png", "644"],
+    ["assets/light-remote-22.png", "usr/share/icons/hicolor/22x22/apps/light-remote.png", "644"],
+    ["assets/light-remote-32.png", "usr/share/icons/hicolor/32x32/apps/light-remote.png", "644"],
+    ["assets/light-remote-48.png", "usr/share/icons/hicolor/48x48/apps/light-remote.png", "644"],
+    ["assets/light-remote-64.png", "usr/share/icons/hicolor/64x64/apps/light-remote.png", "644"],
+    ["assets/light-remote-128.png", "usr/share/icons/hicolor/128x128/apps/light-remote.png", "644"],
+]
+
+[package.metadata.generate-rpm]
+name = "light-remote"
+summary = "Tray icon that controls the office light over Bluetooth"
+pre_install_script = "packaging/rpm/pre-install.sh"
+post_install_script = "packaging/rpm/post-install.sh"
+assets = [
+    { source = "target/release/light-tray", dest = "/usr/bin/light-tray", mode = "755" },
+    { source = "target/release/light-radio", dest = "/usr/libexec/light-radio", mode = "750", group = "light-remote", caps = "cap_net_raw=ep" },
+    { source = "assets/light-tray.desktop", dest = "/usr/share/applications/light-tray.desktop", mode = "644" },
+    { source = "assets/light-tray.desktop", dest = "/etc/xdg/autostart/light-tray.desktop", mode = "644", config = "noreplace" },
+    { source = "assets/light-remote.svg", dest = "/usr/share/icons/hicolor/scalable/apps/light-remote.svg", mode = "644" },
+    { source = "assets/light-remote-16.png", dest = "/usr/share/icons/hicolor/16x16/apps/light-remote.png", mode = "644" },
+    { source = "assets/light-remote-22.png", dest = "/usr/share/icons/hicolor/22x22/apps/light-remote.png", mode = "644" },
+    { source = "assets/light-remote-32.png", dest = "/usr/share/icons/hicolor/32x32/apps/light-remote.png", mode = "644" },
+    { source = "assets/light-remote-48.png", dest = "/usr/share/icons/hicolor/48x48/apps/light-remote.png", mode = "644" },
+    { source = "assets/light-remote-64.png", dest = "/usr/share/icons/hicolor/64x64/apps/light-remote.png", mode = "644" },
+    { source = "assets/light-remote-128.png", dest = "/usr/share/icons/hicolor/128x128/apps/light-remote.png", mode = "644" },
+]
+
+[package.metadata.generate-rpm.requires]
+bluez = "*"
+shadow-utils = "*"
+"libEGL.so.1()(64bit)" = "*"
+"libxkbcommon.so.0()(64bit)" = "*"
+"libwayland-client.so.0()(64bit)" = "*"
+"libwayland-egl.so.1()(64bit)" = "*"

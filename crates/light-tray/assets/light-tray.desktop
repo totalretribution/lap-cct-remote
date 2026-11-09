@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Light remote
+Comment=Tray remote for the office light
+Exec=light-tray
+Icon=light-remote
+Terminal=false
+Categories=Utility;
+StartupNotify=false
+X-GNOME-Autostart-enabled=true

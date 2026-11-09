@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+# Purging also removes the group the package created
+if [ "$1" = purge ] && getent group light-remote >/dev/null; then
+    groupdel light-remote || true
+fi
+
+exit 0

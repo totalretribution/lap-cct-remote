@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <!-- Warm to cool, like the light's colour temperature -->
+    <linearGradient id="glass" x1="12" y1="0" x2="52" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffa733"/>
+      <stop offset="0.48" stop-color="#ffe7a8"/>
+      <stop offset="0.52" stop-color="#e6f4ff"/>
+      <stop offset="1" stop-color="#7cc2ff"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="12" y1="0" x2="52" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#c86a12"/>
+      <stop offset="1" stop-color="#2f7fd0"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6b7480"/>
+      <stop offset="0.4" stop-color="#c3cad3"/>
+      <stop offset="1" stop-color="#5d6570"/>
+    </linearGradient>
+  </defs>
+  <!-- Glass -->
+  <path d="M22 45 C22 38.5 12.5 35 12.5 24.5 A19.5 19.5 0 0 1 51.5 24.5 C51.5 35 42 38.5 42 45 Z"
+        fill="url(#glass)" stroke="url(#edge)" stroke-width="3" stroke-linejoin="round"/>
+  <!-- Highlight -->
+  <ellipse cx="23" cy="19" rx="3.5" ry="7" transform="rotate(30 23 19)" fill="#fff" opacity="0.6"/>
+  <!-- Screw base -->
+  <rect x="21.5" y="45" width="21" height="12" rx="3" fill="url(#metal)" stroke="#3b4048" stroke-width="2"/>
+  <path d="M22.5 49.5 H41.5 M22.5 53 H41.5" stroke="#3b4048" stroke-width="1.6"/>
+  <path d="M27 57 H37 L35 61 H29 Z" fill="#3b4048"/>
+</svg>

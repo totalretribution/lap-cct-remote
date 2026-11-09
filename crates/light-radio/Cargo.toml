@@ -1,0 +1,14 @@
+[package]
+name = "light-radio"
+description = "Privileged helper: sends and hears light remote adverts over a raw HCI socket"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+light-protocol.workspace = true
+libc.workspace = true
+
+[lints]
+workspace = true

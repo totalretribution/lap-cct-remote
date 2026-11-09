@@ -1,0 +1,12 @@
+# Build output
+/target
+
+# Built .deb and .rpm packages (package.sh)
+/packages
+
+# Editor and OS files
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
